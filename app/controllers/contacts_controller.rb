@@ -1,46 +1,49 @@
 class ContactsController < ApplicationController
-  def show_first
-    @contact = Contact.find_by(id: 1)
-    render template: "contacts/show"
-    # contact = Contact.first
-    # render json: {
-    #   id: contact.id,
-    #   first_name: contact.first_name,
-    #   last_name: contact.last_name,
-    #   email: contact.email,
-    #   phone_number: contact.phone_number,
-    # }
-
-    # render json: { message: "hello from contacts" }
+  def index
+    @contacts = Contact.all
+    render :index
   end
 
-  def show_all
-    @contacts = Contact.all
-    render template: "contacts/index"
-    # render json: [
-    #   {
-    #     first_name: contacts[0].first_name,
-    #     last_name: contacts[0].last_name,
-    #     email: contacts[0].email,
-    #     phone_number: contacts[0].phone_number,
-    #   },
+  def show
+    @contact = Contact.find_by(id: params[:id])
+    render :show
+  end
 
-    #   {
-    #     first_name: contacts[1].first_name,
-    #     last_name: contacts[1].last_name,
-    #     email: contacts[1].email,
-    #     phone_number: contacts[1].phone_number,
-    #   },
+  def create
+    @contact = Contact.new(
+      first_name: params[:first_name],
+      last_name: params[:last_name],
+      email: params[:email],
+      phone_number: params[:phone_number],
+      address: params[:address],
+    )
+    if @contact.save
+      render :show
+    else
+      render json: { errors: @contact.errors.full_messages }
+    end
+  end
 
-    #   {
-    #     first_name: contacts[2].first_name,
-    #     last_name: contacts[2].last_name,
-    #     email: contacts[2].email,
-    #     phone_number: contacts[2].phone_number,
-    #   },
+  def update
+    @contact = Contact.find_by(id: params[:id])
+    @contact.first_name = params[:first_name] || @contact.first_name
+    @contact.last_name = params[:last_name] || @contact.last_name
+    @contact.email = params[:email] || @contact.email
+    @contact.phone_number = params[:phone_number] || @contact.phone_number
+    # save updated contact
 
-    # ]
+    if @contact.save
+      render :show
+    else
+      render json: { errors: @contact.errors.full_messages }
+    end
+    # initial test code: render json: {message: "hello"}
+  end
 
-    # render json: { message: "hello from contacts" }
+  def destroy
+    @contact = Contact.find_by(id: params[:id])
+    # delete/destroy contact
+    @contat.destroy
+    render json: { message: "Contact has been successfully removed" }
   end
 end
